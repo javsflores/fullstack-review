@@ -13,17 +13,33 @@ let repoSchema = mongoose.Schema({
 
 let Repo = mongoose.model('Repo', repoSchema);
 
-let save = (repo) => {
+let save = (repos) => {
 
-  repo.save(err, repo) {
-    if (err) {
-      return console.error(err);
+  repos.map((repo) => {
+    var item = {
+      GitHub_Id: repo.id,
+      RepoName: repo.name,
+      Owner: repo.owner.login,
+      URL: repo.html_url,
+      Description: repo.description,
+      Forks: repo.forks_count
     }
-    console.log(repo.RepoName);
-    // return;
-  }
-  // TODO: Your code here
-  // This function should save a repo or repos to
-  // the MongoDB
+
+    var newRepo = new Repo(item);
+    newRepo.save(function (err) {
+      if (err) return handleError(err);
+      console.log('it worked');
+    })
+  })
+
+}
+
+let find = (callback) => {
+  Repo.find(function (err, repo) {
+    if (err) return callback('did not work', null);
+    repo.map((rep) => {console.log('this is it: ', rep._doc)})
+    callback(null, 'it did work')
+  })
 }
 module.exports.save = save;
+module.exports.find = find;
